@@ -26,6 +26,10 @@ module Z16CPU(
     always @(posedge i_clk) begin
         if (i_rst) begin
             r_pc <= 16'h0000;
+        end else if (w_opcode == 4'hC) begin // JAL
+            r_pc <= w_alu_data;
+        end else if (w_opcode == 4'hD) begin // JRL
+            r_pc <= r_pc + w_alu_data;
         end else begin
             r_pc <= r_pc + 16'h0002;
         end
@@ -50,7 +54,25 @@ module Z16CPU(
         .o_alu_ctrl(w_alu_ctrl)
     );
 
-    assign w_rd_data = (w_opcode == 4'hA) ? w_mem_rdata : w_alu_data;
+    assign w_rd_data = select_rd_data(w_opcode, w_mem_rdata, r_pc, w_alu_data);
+
+    function [15:0] select_rd_data;
+        input [3:0] i_opcode;
+        input [15:0] i_mem_rdata;
+        input [15:0] i_pc;
+        input [15:0] i_alu_data;
+
+        begin
+            case(i_opcode)
+                4'hA: select_rd_data = i_mem_rdata; // load
+                4'hC: select_rd_data = i_pc + 16'h0002; // JAL
+                4'hD: select_rd_data = i_pc + 16'h0002; // JALR
+                default: select_rd_data = i_alu_data;
+            endcase 
+        end
+    endfunction
+
+
     Z16RegisterFile RegFile(
         .i_clk(i_clk),
         .i_rs1_addr(w_rs1_addr),
