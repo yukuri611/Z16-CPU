@@ -4,7 +4,20 @@ module Z16CPU(
 );
     
     reg [15:0] r_pc;
+
     wire [15:0] w_instr;
+    wire[3:0] w_rd_addr;
+    wire[3:0] w_rs1_addr;
+    wire[15:0] w_imm;
+    wire[3:0] w_opcode;
+    wire w_rd_we;
+    wire w_mem_we;
+    wire [3:0] w_alu_ctrl;
+
+    wire[15:0] w_rs1_data;
+    
+    wire[15:0] w_alu_data;
+    wire[15:0] w_mem_rdata;
 
     always @(posedge i_clk) begin
         if (i_rst) begin
@@ -14,18 +27,47 @@ module Z16CPU(
         end
     end
 
-    
 
-    Z16InstrMem InstrMem(
+
+    Z16InstrMemory InstrMemory(
         .i_addr(r_pc),
         .o_instr(w_instr)
     );
+
+    Z16Decoder Decoder(
+        .i_instr(w_instr),
+        .o_opcode(w_opcode),
+        .o_rd_addr(w_rd_addr),
+        .o_rs1_addr( w_rs1_addr),
+        .o_imm(w_imm),
+        .o_rd_we(w_rd_we),
+        .o_mem_we(w_mem_we),
+        .o_alu_ctrl(w_alu_ctrl)
+    );
+
+    Z16RegisterFile RegFile(
+        .i_clk(i_clk),
+        .i_rs1_addr(w_rs1_addr),
+        .o_rs1_data(w_rs1_data),
+        .i_rs2_addr(),
+        .o_rs2_data(),
+        .i_rd_addr(w_rd_addr),
+        .i_rd_we(w_rd_we),
+        .i_rd_data(w_mem_rdata)
+    );
+
+    Z16ALU ALU(
+        .i_data_a(w_rs1_data),
+        .i_data_b(w_imm),
+        .i_ctrl(w_alu_ctrl),
+        .o_data(w_alu_data)
+    );
     
-    Z16DataMem DataMem(
-        .i_clk(),
-        .i_addr(),
-        .i_we(),
+    Z16DataMemory DataMemory(
+        .i_clk(i_clk),
+        .i_addr(w_alu_data),
+        .i_we(w_mem_we),
         .i_data(),
-        .o_data()
+        .o_data(w_mem_rdata)
     );
 endmodule
