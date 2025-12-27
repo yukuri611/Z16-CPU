@@ -7,11 +7,7 @@ module Z16DataMemory(
 );
 
     reg[15:0] mem[1023:0];
-    initial begin
-        mem[1] = 16'h0010;
-        mem[2] = 16'h0020;
-    end
-
+    
     //load
     assign o_data = mem[i_addr[10:1]]; // begin with 1 not 0(i_addr = byte address)
 

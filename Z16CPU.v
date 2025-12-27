@@ -8,6 +8,7 @@ module Z16CPU(
     wire [15:0] w_instr;
     wire[3:0] w_rd_addr;
     wire[3:0] w_rs1_addr;
+    wire[3:0] w_rs2_addr;
     wire[15:0] w_imm;
     wire[3:0] w_opcode;
     wire w_rd_we;
@@ -15,6 +16,7 @@ module Z16CPU(
     wire [3:0] w_alu_ctrl;
 
     wire[15:0] w_rs1_data;
+    wire[15:0] w_rs2_data;
     
     wire[15:0] w_alu_data;
     wire[15:0] w_mem_rdata;
@@ -39,6 +41,7 @@ module Z16CPU(
         .o_opcode(w_opcode),
         .o_rd_addr(w_rd_addr),
         .o_rs1_addr( w_rs1_addr),
+        .o_rs2_addr( w_rs2_addr),
         .o_imm(w_imm),
         .o_rd_we(w_rd_we),
         .o_mem_we(w_mem_we),
@@ -49,8 +52,8 @@ module Z16CPU(
         .i_clk(i_clk),
         .i_rs1_addr(w_rs1_addr),
         .o_rs1_data(w_rs1_data),
-        .i_rs2_addr(),
-        .o_rs2_data(),
+        .i_rs2_addr(w_rs2_addr),
+        .o_rs2_data(w_rs2_data),
         .i_rd_addr(w_rd_addr),
         .i_rd_we(w_rd_we),
         .i_rd_data(w_mem_rdata)
@@ -67,7 +70,7 @@ module Z16CPU(
         .i_clk(i_clk),
         .i_addr(w_alu_data),
         .i_we(w_mem_we),
-        .i_data(),
+        .i_data(w_rs2_data),
         .o_data(w_mem_rdata)
     );
 endmodule
