@@ -17,7 +17,9 @@ module Z16CPU(
 
     wire[15:0] w_rs1_data;
     wire[15:0] w_rs2_data;
+    wire[15:0] w_rd_data;
     
+    wire [15:0] w_data_b;
     wire[15:0] w_alu_data;
     wire[15:0] w_mem_rdata;
 
@@ -48,6 +50,7 @@ module Z16CPU(
         .o_alu_ctrl(w_alu_ctrl)
     );
 
+    assign w_rd_data = (w_opcode == 4'hA) ? w_mem_rdata : w_alu_data;
     Z16RegisterFile RegFile(
         .i_clk(i_clk),
         .i_rs1_addr(w_rs1_addr),
@@ -56,12 +59,13 @@ module Z16CPU(
         .o_rs2_data(w_rs2_data),
         .i_rd_addr(w_rd_addr),
         .i_rd_we(w_rd_we),
-        .i_rd_data(w_mem_rdata)
+        .i_rd_data(w_rd_data)
     );
 
+    assign w_data_b = (w_opcode <=4'h8) ? w_rs2_data: w_imm;
     Z16ALU ALU(
         .i_data_a(w_rs1_data),
-        .i_data_b(w_imm),
+        .i_data_b(w_data_b),
         .i_ctrl(w_alu_ctrl),
         .o_data(w_alu_data)
     );
