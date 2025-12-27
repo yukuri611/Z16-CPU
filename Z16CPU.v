@@ -30,6 +30,10 @@ module Z16CPU(
             r_pc <= w_alu_data;
         end else if (w_opcode == 4'hD) begin // JRL
             r_pc <= r_pc + w_alu_data;
+        end else if((w_opcode == 4'hE) && (w_rs2_data == w_rs1_data)) begin // BEQ
+            r_pc <= r_pc + w_imm;
+        end else if ((w_opcode == 4'hF) && (w_rs1_data < w_rs2_data)) begin // BLT
+            r_pc <= r_pc + w_imm;
         end else begin
             r_pc <= r_pc + 16'h0002;
         end
